@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.swagserv.andrew2060.karmasystem.KarmaBasePlugin;
+import net.swagserv.andrew2060.karmasystem.api.events.KarmaEffectSaveEvent;
 import net.swagserv.andrew2060.karmasystem.effects.KarmaEffect;
 import net.swagserv.andrew2060.karmasystem.util.FileManager;
 
@@ -42,6 +43,10 @@ public class EffectSaveListener implements Listener {
 				toSave.add((KarmaEffect)effect);
 			}
 		}
-		fileMan.saveEffects(toSave,h);
+		KarmaEffectSaveEvent saveEvent = new KarmaEffectSaveEvent(toSave,h);
+		saveEvent.callEvent();
+		if(!saveEvent.isCancelled()) {
+			fileMan.saveEffects(saveEvent.getEffects(),h);
+		}
 	}
 }
