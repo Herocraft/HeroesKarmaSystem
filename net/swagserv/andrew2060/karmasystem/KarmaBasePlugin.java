@@ -1,47 +1,42 @@
 package net.swagserv.andrew2060.karmasystem;
 
+import java.io.File;
 import java.util.logging.Level;
 
 import net.swagserv.andrew2060.karmasystem.listeners.EffectApplicationListener;
-import net.swagserv.andrew2060.karmasystem.listeners.PVPListener;
+import net.swagserv.andrew2060.karmasystem.util.FileManager;
 
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.griefcraft.lwc.LWC;
-import com.griefcraft.lwc.LWCPlugin;
 import com.herocraftonline.heroes.Heroes;
 
-public class Plugin extends JavaPlugin {
+public class KarmaBasePlugin extends JavaPlugin {
+	FileManager fileMan;
 	Heroes heroes;
-	LWC lwc;
+	public File PLUGINBASEFOLDER = new File("plugins" + File.separator + "KarmaPlugin");
+	public File PLUGINDATAFOLDER = new File(PLUGINBASEFOLDER + File.separator + "Data");
 	public long karmaDuration = 0;
 	//TODO: temporarily permanent karma effects until proper implementation is done
 	
 	@Override
 	public void onEnable() {
 		if(!initiateIntegration()) {
-			Bukkit.getLogger().log(Level.SEVERE, "You tried to use this plugin while missing one of its dependencies");
 			Bukkit.getServer().getPluginManager().disablePlugin(this);
 		}
+		fileMan = new FileManager(this);
 		Bukkit.getPluginManager().registerEvents(new EffectApplicationListener(heroes), this);
-		Bukkit.getPluginManager().registerEvents(new PVPListener(heroes,this), this);
 	}
-	
+	public FileManager getFileManager() {
+		return fileMan;
+	}
 	public boolean initiateIntegration() {
 		heroes = (Heroes)Bukkit.getServer().getPluginManager().getPlugin("Heroes");
 		if(heroes == null) {
+			Bukkit.getLogger().log(Level.SEVERE, "Dependency not found: Heroes");
 			return false;
 		}
-		PluginManager pm = Bukkit.getServer().getPluginManager();
-		LWCPlugin plugin=(LWCPlugin)pm.getPlugin("LWC");
-		if ((null == plugin)||( ! pm.isPluginEnabled("LWC"))) {
-			return false;
-		}else{
-			lwc = LWC.getInstance();
-		}
-		return false;
+		return true;
 	}
 
 }
