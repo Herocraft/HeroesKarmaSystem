@@ -12,8 +12,8 @@ import com.herocraftonline.heroes.characters.Hero;
 
 public class KarmaEffectSaveEvent extends Event {
 	private static final HandlerList handlers = new HandlerList();
-	List<KarmaEffect> toSave;
-	Hero h;
+	private List<KarmaEffect> toSave;
+	private Hero h;
 	boolean cancelled = false;
 	/**
 	 * Event called when karma effects are saved to file

@@ -15,9 +15,11 @@ import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import net.swagserv.andrew2060.karmasystem.KarmaBasePlugin;
+import net.swagserv.andrew2060.karmasystem.api.events.KarmaEffectSaveEvent;
 import net.swagserv.andrew2060.karmasystem.effects.KarmaEffect;
 
 import com.herocraftonline.heroes.characters.Hero;
+import com.herocraftonline.heroes.characters.effects.Effect;
 
 
 public class FileManager {
@@ -25,26 +27,36 @@ public class FileManager {
 	public FileManager(KarmaBasePlugin plugin) {
 		this.plugin = plugin;
 	}
-
-	public boolean hasFile(Hero h) {
-		File storageFile = new File(constructDataFolder(h), h.getPlayer().getName().toUpperCase() + ".prop");
+	/**
+	 * Checks if a given hero has a savefile associated with him
+	 * 
+	 * @param hero
+	 * @return
+	 */
+	public boolean hasFile(Hero hero) {
+		File storageFile = new File(constructDataFolder(hero), hero.getPlayer().getName().toUpperCase() + ".prop");
 		if(storageFile.exists()) {
 			return true;
 		} else {
 			return false;
 		}
 	}
-
-
-
 	private File constructDataFolder(Hero h) {
 		char firstLetter = (h.getName().toUpperCase().toCharArray())[0];
 		File constructed = new File(plugin.PLUGINDATAFOLDER + File.separator + "Data" + File.separator + firstLetter);
 		return constructed;
 	}
-
-	public List<KarmaEffect> getEffects(Hero h) {
-		File storageFile = new File(constructDataFolder(h), h.getPlayer().getName().toUpperCase() + ".prop");
+	/**
+	 * Gets the list of karma effects associated with a character from file
+	 * @param hero
+	 * @return
+	 */
+	public List<KarmaEffect> getEffects(Hero hero) {
+		File dataFolder = constructDataFolder(hero);
+		if(!dataFolder.exists()) {
+			dataFolder.mkdirs();
+		}
+		File storageFile = new File(dataFolder, hero.getPlayer().getName().toUpperCase() + ".prop");
 		try {
 			FileInputStream fstream = new FileInputStream(storageFile);
 			DataInputStream in = new DataInputStream(fstream);
@@ -74,8 +86,27 @@ public class FileManager {
 			return null;
 		}
 	}
-
-	public void saveEffects(List<KarmaEffect> toSave, Hero h) {
+	/**
+	 * Saves karma effects to file - must be prefixed by "Karma-" in the effect name
+	 * @param h	Hero to save
+	 */
+	public void saveEffects(Hero h) {
+		Iterator<Effect> effectListIterator = h.getEffects().iterator();
+		List<KarmaEffect> toSave = new ArrayList<KarmaEffect>();
+		while(effectListIterator.hasNext()) {
+			Effect effect = effectListIterator.next();
+			if(!effect.getName().contains("Karma-")) {
+				continue;
+			} else {
+				toSave.add((KarmaEffect)effect);
+			}
+		}
+		KarmaEffectSaveEvent saveEvent = new KarmaEffectSaveEvent(toSave,h);
+		saveEvent.callEvent();
+		if(!saveEvent.isCancelled()) {
+			toSave = saveEvent.getEffects();
+			return;
+		}
 		Iterator<KarmaEffect> saveIterate = toSave.iterator();
 		File storageFile = new File(constructDataFolder(h), h.getPlayer().getName().toUpperCase() + ".prop");
 		if(storageFile.exists()) {

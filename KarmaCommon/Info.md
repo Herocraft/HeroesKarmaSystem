@@ -1,0 +1,1 @@
+Includes examples of common implementations of Karma, such as for PvP related implementations

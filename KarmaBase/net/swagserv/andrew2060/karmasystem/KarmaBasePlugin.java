@@ -16,7 +16,7 @@ public class KarmaBasePlugin extends JavaPlugin {
 	Heroes heroes;
 	public File PLUGINBASEFOLDER = new File("plugins" + File.separator + "KarmaPlugin");
 	public File PLUGINDATAFOLDER = new File(PLUGINBASEFOLDER + File.separator + "Data");
-	public long karmaDuration = 0;
+	public long karmaDuration;
 	//TODO: temporarily permanent karma effects until proper implementation is done
 	
 	@Override
@@ -26,7 +26,12 @@ public class KarmaBasePlugin extends JavaPlugin {
 		}
 		fileMan = new FileManager(this);
 		Bukkit.getPluginManager().registerEvents(new EffectApplicationListener(heroes), this);
+		karmaDuration = getConfig().getLong("DefaultKarmaDuration");
 	}
+	/**
+	 * Gets the file manager associated with the i/o operations of this plugin
+	 * @return FileManager
+	 */
 	public FileManager getFileManager() {
 		return fileMan;
 	}

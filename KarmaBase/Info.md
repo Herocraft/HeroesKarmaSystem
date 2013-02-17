@@ -1,0 +1,1 @@
+This is the base implementation of the Karma system that is implemented by various other plugins.

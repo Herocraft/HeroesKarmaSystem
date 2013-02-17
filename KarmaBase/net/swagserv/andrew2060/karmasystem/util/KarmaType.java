@@ -10,7 +10,7 @@ public enum KarmaType {
 		this.effectName = effectName;
 	}
 	public String node() {
-		return ("Karma-" +effectName);
+		return ("Karma-"+effectName);
 	}
 	public String customType(String arg) {
 		return ("Karma-"+arg);
